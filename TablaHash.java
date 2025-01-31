@@ -19,17 +19,19 @@ public class TablaHash {
     }
 
     // Método de resolución de colisiones: (CLAVE + 1) MOD 50
-    private int resolveCollision(int key, int index) {
-        return (key + 1) % TABLE_SIZE;
+    private int resolveCollision(int key, int attempt) {
+        return (key + attempt) % TABLE_SIZE;
     }
 
     // Insertar un valor en la tabla hash
     public void insert(int key) {
+        int attempt = 0;
         int index = hashFunction(key);
 
         // Resolver colisiones
         while (hashTable[index] != null) {
-            index = resolveCollision(key, index);
+            attempt++;
+            index = resolveCollision(key, attempt);
         }
 
         hashTable[index] = key;
@@ -37,11 +39,18 @@ public class TablaHash {
 
     // Búsqueda lineal en la tabla hash
     public int linearSearch(int key) {
-        for (int i = 0; i < TABLE_SIZE; i++) {
-            if (hashTable[i] != null && hashTable[i] == key) {
-                return i; // Retorna la posición donde se encontró la clave
+        int attempt = 0;
+        int index = hashFunction(key);
+
+        // Buscar en la tabla hash
+        while (hashTable[index] != null) {
+            if (hashTable[index] == key) {
+                return index; // Retorna la posición donde se encontró la clave
             }
+            attempt++;
+            index = resolveCollision(key, attempt);
         }
+
         return -1; // Retorna -1 si no se encuentra la clave
     }
 
@@ -90,13 +99,19 @@ public class TablaHash {
             hashTable.insert(value);
         }
 
+        // Imprimir la tabla hash para verificación
+        System.out.println("Tabla hash:");
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            System.out.println("Posición " + i + ": " + hashTable.hashTable[i]);
+        }
+
         // Búsqueda lineal
         int keyToSearch = 103;
         int linearSearchResult = hashTable.linearSearch(keyToSearch);
         if (linearSearchResult != -1) {
-            System.out.println("Búsqueda lineal: El valor " + keyToSearch + " se encuentra en la posición " + linearSearchResult);
+            System.out.println("\nBúsqueda lineal: El valor " + keyToSearch + " se encuentra en la posición " + linearSearchResult);
         } else {
-            System.out.println("Búsqueda lineal: El valor " + keyToSearch + " no se encuentra en la tabla hash");
+            System.out.println("\nBúsqueda lineal: El valor " + keyToSearch + " no se encuentra en la tabla hash");
         }
 
         // Búsqueda binaria
